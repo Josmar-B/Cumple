@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Feliz Cumpleaños</title>
+    
+    <!-- Librerías CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #000;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            transition: background 2s ease;
+        }
+
+        #game-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        #starfield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 3s ease;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+        }
+
+        .star-large {
+            width: 3px;
+            height: 3px;
+            box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.8);
+        }
+
+        .star-medium {
+            width: 2px;
+            height: 2px;
+            box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.6);
+        }
+
+        .star-small {
+            width: 1px;
+            height: 1px;
+            box-shadow: 0 0 2px 1px rgba(255, 255, 255, 0.4);
+        }
+
+        #dialog-container {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            border: 4px solid #000;
+            padding: 25px;
+            z-index: 10;
+            box-shadow: 0 0 0 2px white;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        #character-container {
+            position: absolute;
+            bottom: 320px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 220px;
+            height: 220px;
+            z-index: 5;
+            border: 4px solid white;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: glowPulse 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 0 5px rgba(255, 255, 255, 0.3),
+                    0 0 10px rgba(255, 255, 255, 0.2),
+                    0 0 15px rgba(255, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    0 0 20px rgba(255, 255, 255, 0.8),
+                    0 0 30px rgba(255, 255, 255, 0.6),
+                    0 0 40px rgba(255, 255, 255, 0.4),
+                    0 0 50px rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        @keyframes strongGlowPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 0 10px rgba(255, 255, 255, 0.5),
+                    0 0 20px rgba(255, 255, 255, 0.3),
+                    0 0 30px rgba(255, 255, 255, 0.2);
+            }
+            50% {
+                box-shadow: 
+                    0 0 30px rgba(255, 255, 255, 1),
+                    0 0 50px rgba(255, 255, 255, 0.8),
+                    0 0 70px rgba(255, 255, 255, 0.6),
+                    0 0 90px rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        #character-image {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+            image-rendering: pixelated;
+        }
+
+        .character-placeholder {
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            padding: 20px;
+        }
+
+        #dialog-text {
+            font-size: 20px;
+            line-height: 1.5;
+            min-height: 90px;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 2px solid #000;
+            margin-bottom: 15px;
+            animation: textGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes textGlow {
+            0%, 100% {
+                box-shadow: 
+                    inset 0 0 5px rgba(0, 0, 0, 0.1),
+                    0 0 5px rgba(255, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    inset 0 0 10px rgba(0, 0, 0, 0.2),
+                    0 0 15px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        #continue-indicator {
+            position: absolute;
+            bottom: 15px;
+            right: 25px;
+            font-size: 16px;
+            animation: blink 1s infinite, indicatorGlow 2s ease-in-out infinite;
+            color: #000;
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border: 2px solid #000;
+        }
+
+        @keyframes indicatorGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(-50%); }
+            25% { transform: translateX(-52%); }
+            50% { transform: translateX(-48%); }
+            75% { transform: translateX(-52%); }
+        }
+
+        @keyframes characterShake {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            25% { transform: translateX(-50%) translateY(-8px); }
+            50% { transform: translateX(-50%) translateY(8px); }
+            75% { transform: translateX(-50%) translateY(-8px); }
+        }
+
+        .shaking {
+            animation: 
+                shake 0.3s ease-in-out infinite,
+                strongGlowPulse 1s ease-in-out infinite !important;
+        }
+
+        .character-shaking {
+            animation: 
+                characterShake 0.3s ease-in-out infinite,
+                strongGlowPulse 1s ease-in-out infinite !important;
+        }
+
+        .night-sky {
+            background: linear-gradient(180deg, #2d1b69 0%, #1a1033 100%);
+        }
+
+        .music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #000;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #000;
+            transition: all 0.3s ease;
+            animation: controlGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes controlGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        .music-control:hover {
+            background: #000;
+            color: white;
+            animation: controlHoverGlow 1s ease-in-out infinite;
+        }
+
+        @keyframes controlHoverGlow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(255, 255, 255, 1);
+            }
+        }
+
+        .title-overlay {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: white;
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 30px;
+            border: 3px solid white;
+            animation: titleGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                box-shadow: 
+                    0 0 10px rgba(255, 255, 255, 0.3),
+                    0 0 20px rgba(255, 255, 255, 0.2);
+            }
+            50% {
+                box-shadow: 
+                    0 0 20px rgba(255, 255, 255, 0.8),
+                    0 0 40px rgba(255, 255, 255, 0.6),
+                    0 0 60px rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        .title-overlay h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 0 #000;
+            animation: textPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes textPulse {
+            0%, 100% {
+                text-shadow: 
+                    2px 2px 0 #000,
+                    0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                text-shadow: 
+                    2px 2px 0 #000,
+                    0 0 15px rgba(255, 255, 255, 0.8),
+                    0 0 25px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .title-overlay p {
+            font-size: 14px;
+            opacity: 0.8;
+            animation: subtitlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes subtitlePulse {
+            0%, 100% {
+                text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
+            }
+            50% {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .dialog-progress {
+            height: 6px;
+            background: #000;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #000;
+        }
+
+        .dialog-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            width: 0%;
+            transition: width 0.5s ease;
+            animation: progressGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes progressGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        /* Efectos mejorados con librerías */
+        .particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* Efectos de texto mejorados */
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 red;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 blue;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(42px, 9999px, 44px, 0); }
+            5% { clip: rect(12px, 9999px, 59px, 0); }
+            10% { clip: rect(48px, 9999px, 29px, 0); }
+            15% { clip: rect(42px, 9999px, 73px, 0); }
+            20% { clip: rect(63px, 9999px, 27px, 0); }
+            25% { clip: rect(34px, 9999px, 55px, 0); }
+            30% { clip: rect(86px, 9999px, 73px, 0); }
+            35% { clip: rect(20px, 9999px, 20px, 0); }
+            40% { clip: rect(26px, 9999px, 60px, 0); }
+            45% { clip: rect(25px, 9999px, 66px, 0); }
+            50% { clip: rect(57px, 9999px, 98px, 0); }
+            55% { clip: rect(5px, 9999px, 46px, 0); }
+            60% { clip: rect(82px, 9999px, 31px, 0); }
+            65% { clip: rect(54px, 9999px, 27px, 0); }
+            70% { clip: rect(28px, 9999px, 99px, 0); }
+            75% { clip: rect(45px, 9999px, 69px, 0); }
+            80% { clip: rect(23px, 9999px, 85px, 0); }
+            85% { clip: rect(54px, 9999px, 84px, 0); }
+            90% { clip: rect(45px, 9999px, 47px, 0); }
+            95% { clip: rect(37px, 9999px, 20px, 0); }
+            100% { clip: rect(4px, 9999px, 91px, 0); }
+        }
+
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            5% { clip: rect(52px, 9999px, 74px, 0); }
+            10% { clip: rect(79px, 9999px, 85px, 0); }
+            15% { clip: rect(75px, 9999px, 5px, 0); }
+            20% { clip: rect(67px, 9999px, 61px, 0); }
+            25% { clip: rect(14px, 9999px, 79px, 0); }
+            30% { clip: rect(1px, 9999px, 66px, 0); }
+            35% { clip: rect(86px, 9999px, 30px, 0); }
+            40% { clip: rect(23px, 9999px, 98px, 0); }
+            45% { clip: rect(85px, 9999px, 72px, 0); }
+            50% { clip: rect(71px, 9999px, 75px, 0); }
+            55% { clip: rect(2px, 9999px, 48px, 0); }
+            60% { clip: rect(30px, 9999px, 16px, 0); }
+            65% { clip: rect(59px, 9999px, 50px, 0); }
+            70% { clip: rect(41px, 9999px, 62px, 0); }
+            75% { clip: rect(2px, 9999px, 82px, 0); }
+            80% { clip: rect(47px, 9999px, 73px, 0); }
+            85% { clip: rect(3px, 9999px, 27px, 0); }
+            90% { clip: rect(26px, 9999px, 55px, 0); }
+            95% { clip: rect(42px, 9999px, 97px, 0); }
+            100% { clip: rect(38px, 9999px, 49px, 0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Control de música -->
+    <div class="music-control" id="music-control" title="Activar/Desactivar música">♪</div>
+    
+    <!-- Audio para música de fondo -->
+    <audio id="background-music" loop>
+        <source src="musica/Little More Theme.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    
+    <!-- Canvas para partículas -->
+    <div id="particles-js" class="particles-js"></div>
+    
+    <div id="game-container">
+        <div class="title-overlay">
+            <h1 class="glitch-text" data-text="🎂 Feliz Cumpleaños 🎂">🎂 Feliz Cumpleaños 🎂</h1>
+            <p>Una aventura especial para ti</p>
+        </div>
+      
+        <div id="starfield"></div>
+        <div id="character-container">
+            <div class="character-placeholder">Cargando personaje...</div>
+            <img id="character-image" src="" alt="Expresión del personaje">
+        </div>
+        <div id="dialog-container">
+            <div id="dialog-text"></div>
+            <div class="dialog-progress">
+                <div class="dialog-progress-fill" id="dialog-progress"></div>
+            </div>
+            <div id="continue-indicator">▼ Click para continuar ▼</div>
+        </div>
+    </div>
+
+    <!-- Librerías JavaScript -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        // Diálogos de la novela visual con sus respectivas imágenes
+        const dialogs = [
+            {
+                text: "Finalmente llegas aquí, estuve esperando mucho rato para este momento",
+                image: "imagenes/Arthur/Arthur.jpg"
+            },
+            {
+                text: "Realmente esperaba desearte un feliz cumpleaños sencillo pero quise ser mas ambicioso con lo poco que se en esta vida.",
+                image: "imagenes/Arthur/Arthur_Feli.jpg"
+            },
+            {
+                text: "Por eso...",
+                image: "imagenes/Arthur/Arthur.jpg"
+            },
+            {
+                text: "Haremos un pequeño juego juntos.",
+                image: "imagenes/Arthur/Arthur_Feli.jpg"
+            },
+            {
+                text: "¿No importa si ganas o pierdes, solo disfruta algo hecho con cariño, si?",
+                image: "imagenes/Arthur/Arthur_Feli.jpg"
+            }
+        ];
+
+        // Variables de control
+        let currentDialog = 0;
+        let currentText = '';
+        let isTyping = false;
+        let typingSpeed = 30;
+        let musicEnabled = true;
+
+        // Elementos DOM
+        const dialogText = document.getElementById('dialog-text');
+        const continueIndicator = document.getElementById('continue-indicator');
+        const dialogContainer = document.getElementById('dialog-container');
+        const characterContainer = document.getElementById('character-container');
+        const characterImage = document.getElementById('character-image');
+        const characterPlaceholder = document.querySelector('.character-placeholder');
+        const body = document.body;
+        const starfield = document.getElementById('starfield');
+        const backgroundMusic = document.getElementById('background-music');
+        const musicControl = document.getElementById('music-control');
+        const dialogProgress = document.querySelector('.dialog-progress-fill');
+
+        // Inicializar partículas de fondo
+        function initParticles() {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: "#ffffff" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.3, random: true },
+                    size: { value: 2, random: true },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: "#ffffff",
+                        opacity: 0.2,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 1,
+                        direction: "none",
+                        random: true,
+                        straight: false,
+                        out_mode: "out",
+                        bounce: false
+                    }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "repulse" },
+                        onclick: { enable: true, mode: "push" },
+                        resize: true
+                    }
+                }
+            });
+        }
+
+        // Inicializar estrellas
+        function createStars() {
+            const starsCount = 150;
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                const size = Math.random();
+                
+                if (size > 0.7) {
+                    star.className = 'star star-large';
+                } else if (size > 0.4) {
+                    star.className = 'star star-medium';
+                } else {
+                    star.className = 'star star-small';
+                }
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                if (Math.random() > 0.7) {
+                    star.style.animation = `blink ${Math.random() * 3 + 2}s infinite`;
+                }
+                
+                starfield.appendChild(star);
+            }
+        }
+
+        // Control de música
+        function setupMusic() {
+            // Intentar reproducir música después de la interacción del usuario
+            document.addEventListener('click', function initMusic() {
+                if (musicEnabled) {
+                    backgroundMusic.volume = 0.3;
+                    backgroundMusic.play().catch(e => {
+                        console.log("La reproducción automática fue bloqueada:", e);
+                    });
+                }
+                document.removeEventListener('click', initMusic);
+            }, { once: true });
+            
+            // Control para activar/desactivar música
+            musicControl.addEventListener('click', function() {
+                musicEnabled = !musicEnabled;
+                if (musicEnabled) {
+                    backgroundMusic.play();
+                    musicControl.textContent = '♪';
+                    musicControl.style.background = 'rgba(255, 255, 255, 0.9)';
+                    musicControl.style.color = '#000';
+                } else {
+                    backgroundMusic.pause();
+                    musicControl.textContent = '🔇';
+                    musicControl.style.background = 'rgba(255, 0, 0, 0.3)';
+                }
+            });
+        }
+
+        // Actualizar progreso de diálogos
+        function updateDialogProgress() {
+            const progress = (currentDialog / dialogs.length) * 100;
+            dialogProgress.style.width = `${progress}%`;
+        }
+
+        // Cambiar imagen del personaje
+        function changeCharacterImage(imageUrl) {
+            if (imageUrl) {
+                characterImage.src = imageUrl;
+                characterImage.style.display = 'block';
+                characterPlaceholder.style.display = 'none';
+            } else {
+                characterImage.style.display = 'none';
+                characterPlaceholder.style.display = 'block';
+            }
+        }
+
+        // Efecto de escritura letra por letra con GSAP
+        function typeWriter(dialog, callback) {
+            isTyping = true;
+            currentText = '';
+            let index = 0;
+            
+            continueIndicator.style.display = 'none';
+            
+            // Cambiar imagen del personaje para este diálogo
+            changeCharacterImage(dialog.image);
+            
+            const typingInterval = setInterval(() => {
+                if (index < dialog.text.length) {
+                    currentText += dialog.text.charAt(index);
+                    dialogText.textContent = currentText;
+                    index++;
+                } else {
+                    clearInterval(typingInterval);
+                    isTyping = false;
+                    continueIndicator.style.display = 'block';
+                    if (callback) callback();
+                }
+            }, typingSpeed);
+        }
+
+        // Mostrar siguiente diálogo
+        function nextDialog() {
+            if (isTyping) {
+                // Si está escribiendo, completar el texto inmediatamente
+                dialogText.textContent = dialogs[currentDialog].text;
+                isTyping = false;
+                continueIndicator.style.display = 'block';
+                return;
+            }
+            
+            if (currentDialog < dialogs.length) {
+                typeWriter(dialogs[currentDialog]);
+                currentDialog++;
+                updateDialogProgress();
+                
+                // Cuando llegamos al último diálogo, activar la transición
+                if (currentDialog === dialogs.length) {
+                    setTimeout(startTransition, 1000);
+                }
+            }
+        }
+
+        // Transición al cielo estrellado
+        function startTransition() {
+            // Agitar el recuadro y el personaje
+            dialogContainer.classList.add('shaking');
+            characterContainer.classList.add('character-shaking');
+            
+            // Cambiar fondo a noche
+            body.classList.add('night-sky');
+            
+            // Mostrar estrellas gradualmente
+            setTimeout(() => {
+                starfield.style.opacity = '1';
+            }, 1000);
+            
+            // Efecto de confeti con la librería
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            
+            // Detener agitación después de 2 segundos y redireccionar
+            setTimeout(() => {
+                dialogContainer.classList.remove('shaking');
+                characterContainer.classList.remove('character-shaking');
+                // Redireccionar al quiz
+                setTimeout(() => {
+                    window.location.href = 'quiz.html';
+                }, 1000);
+            }, 2000);
+        }
+
+        // Animaciones GSAP para elementos
+        function initAnimations() {
+            // Animación de entrada para los contenedores
+            gsap.from([dialogContainer, characterContainer], {
+                duration: 1.5,
+                y: 100,
+                opacity: 0,
+                stagger: 0.3,
+                ease: "back.out(1.7)"
+            });
+            
+            // Animación para el título
+            gsap.from('.title-overlay', {
+                duration: 2,
+                y: -50,
+                opacity: 0,
+                ease: "bounce.out"
+            });
+        }
+
+        // Inicializar
+        function init() {
+            createStars();
+            initParticles();
+            setupMusic();
+            updateDialogProgress();
+            initAnimations();
+            nextDialog();
+            
+            // Event listeners
+            document.addEventListener('click', nextDialog);
+            document.addEventListener('keydown', (e) => {
+                // Solo permitir espacio o enter si no se está escribiendo
+                if ((e.code === 'Space' || e.code === 'Enter') && !isTyping) {
+                    nextDialog();
+                }
+            });
+        }
+
+        // Iniciar la novela visual cuando se carga la página
+        window.onload = init;
+    </script>
+</body>
+</html>

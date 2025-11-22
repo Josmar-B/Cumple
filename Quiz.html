@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Feliz Cumpleaños</title>
+    
+    <!-- Librerías CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #000;
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+            transition: background 2s ease;
+        }
+
+        .night-sky {
+            background: linear-gradient(180deg, #2d1b69 0%, #1a1033 100%);
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -2;
+        }
+
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 1;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+        }
+
+        .star-large {
+            width: 3px;
+            height: 3px;
+            box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.8);
+        }
+
+        .star-medium {
+            width: 2px;
+            height: 2px;
+            box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.6);
+        }
+
+        .star-small {
+            width: 1px;
+            height: 1px;
+            box-shadow: 0 0 2px 1px rgba(255, 255, 255, 0.4);
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 6px 2px white;
+            opacity: 0;
+        }
+
+        @keyframes shooting {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-100px) translateY(100px);
+                opacity: 0;
+            }
+        }
+
+        #quiz-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 4px solid white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 0 5px rgba(255, 255, 255, 0.3),
+                    0 0 10px rgba(255, 255, 255, 0.2),
+                    0 0 15px rgba(255, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    0 0 20px rgba(255, 255, 255, 0.8),
+                    0 0 30px rgba(255, 255, 255, 0.6),
+                    0 0 40px rgba(255, 255, 255, 0.4),
+                    0 0 50px rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        .quiz-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0 #000;
+            color: #fff;
+            animation: textPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes textPulse {
+            0%, 100% {
+                text-shadow: 
+                    2px 2px 0 #000,
+                    0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                text-shadow: 
+                    2px 2px 0 #000,
+                    0 0 15px rgba(255, 255, 255, 0.8),
+                    0 0 25px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .quiz-subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+            animation: subtitlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes subtitlePulse {
+            0%, 100% {
+                text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
+            }
+            50% {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .question-container {
+            background: white;
+            color: black;
+            border: 4px solid #000;
+            margin: 30px 0;
+            padding: 20px;
+            box-shadow: 0 0 0 2px white, 0 0 15px rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: containerGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes containerGlow {
+            0%, 100% {
+                box-shadow: 
+                    0 0 0 2px white, 
+                    0 0 15px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 
+                    0 0 0 2px white, 
+                    0 0 25px rgba(255, 255, 255, 0.8),
+                    0 0 40px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .question-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #54a0ff);
+        }
+
+        .question-number {
+            position: sticky;
+            top: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10;
+            color: white;
+            padding: 5px 15px;
+            border: 2px solid white;
+            font-size: 14px;
+            border-radius: 0;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            padding: 10px;
+            background: #f0f0f0;
+            border: 2px solid #000;
+            animation: textGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes textGlow {
+            0%, 100% {
+                box-shadow: 
+                    inset 0 0 5px rgba(0, 0, 0, 0.1),
+                    0 0 5px rgba(255, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    inset 0 0 10px rgba(0, 0, 0, 0.2),
+                    0 0 15px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .image-side {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid #000;
+            background: #000;
+            min-height: 200px;
+            position: relative;
+            overflow: hidden;
+            animation: imageGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes imageGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        .image-side::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 90%, rgba(255,255,255,0.1) 100%);
+            pointer-events: none;
+        }
+
+        .question-image {
+            max-width: 100%;
+            max-height: 300px;
+            border: 2px solid white;
+            image-rendering: pixelated;
+        }
+
+        .options-side {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background: white;
+            color: black;
+            border: 3px solid #000;
+            padding: 15px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: optionGlow 5s ease-in-out infinite;
+        }
+
+        @keyframes optionGlow {
+            0%, 100% {
+                box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        .option::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .option:hover::before {
+            left: 100%;
+        }
+
+        .option:hover {
+            background: #000;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            animation: optionHoverGlow 1s ease-in-out infinite;
+        }
+
+        @keyframes optionHoverGlow {
+            0%, 100% {
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            }
+            50% {
+                box-shadow: 0 6px 12px rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        .hidden-option {
+            opacity: 0.5;
+            font-style: italic;
+            background: #f0f0f0;
+        }
+
+        .hidden-option:hover {
+            opacity: 1;
+            background: #000;
+        }
+
+        /* Contenedor de respuesta del personaje con imagen */
+        .character-response-container {
+            display: none;
+            margin-top: 20px;
+            border: 4px solid #000;
+            background: white;
+            padding: 15px;
+            animation: fadeIn 0.5s ease, glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .character-response-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .character-image-container {
+            flex-shrink: 0;
+            width: 100px;
+            height: 100px;
+            border: 3px solid #000;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            animation: imageGlow 3s ease-in-out infinite;
+        }
+
+        .character-image-container::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid rgba(255,255,255,0.2);
+            pointer-events: none;
+        }
+
+        .character-response-image {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            image-rendering: pixelated;
+        }
+
+        .character-response-text {
+            flex: 1;
+            color: black;
+            font-size: 16px;
+            line-height: 1.4;
+            padding: 10px;
+            background: #f9f9f9;
+            border: 2px dashed #ccc;
+            animation: textGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .next-indicator {
+            text-align: center;
+            margin-top: 20px;
+            animation: blink 1s infinite, indicatorGlow 2s ease-in-out infinite;
+            display: none;
+            padding: 10px;
+            background: #000;
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes indicatorGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        .next-indicator:hover {
+            background: white;
+            color: black;
+            animation: controlHoverGlow 1s ease-in-out infinite;
+        }
+
+        @keyframes controlHoverGlow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(255, 255, 255, 1);
+            }
+        }
+
+        .image-placeholder {
+            color: white;
+            text-align: center;
+            font-size: 14px;
+            padding: 20px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #000;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            width: 0%;
+            transition: width 0.5s ease;
+            animation: progressGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes progressGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        .music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #000;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #000;
+            transition: all 0.3s ease;
+            animation: controlGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes controlGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        .music-control:hover {
+            background: #000;
+            color: white;
+            animation: controlHoverGlow 1s ease-in-out infinite;
+        }
+
+        /* Estilos para respuestas correctas e incorrectas */
+        .option.correct {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #2E7D32;
+            animation: correctGlow 1s ease-in-out infinite;
+        }
+
+        @keyframes correctGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(76, 175, 80, 0.9);
+            }
+        }
+
+        .option.incorrect {
+            background-color: #F44336;
+            color: white;
+            border-color: #C62828;
+            animation: incorrectGlow 1s ease-in-out infinite;
+        }
+
+        @keyframes incorrectGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(244, 67, 54, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(244, 67, 54, 0.9);
+            }
+        }
+
+        /* Estilos para el campo de entrada personalizado */
+        .custom-answer-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .custom-answer-input {
+            padding: 12px;
+            border: 3px solid #000;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            background: white;
+            color: black;
+            animation: inputGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes inputGlow {
+            0%, 100% {
+                box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        .custom-answer-input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+            animation: inputFocusGlow 1s ease-in-out infinite;
+        }
+
+        @keyframes inputFocusGlow {
+            0%, 100% {
+                box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
+            }
+        }
+
+        .submit-custom-answer {
+            padding: 12px;
+            background: #000;
+            color: white;
+            border: 3px solid #000;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: buttonGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes buttonGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .submit-custom-answer:hover {
+            background: white;
+            color: black;
+            animation: buttonHoverGlow 1s ease-in-out infinite;
+        }
+
+        @keyframes buttonHoverGlow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
+            }
+        }
+
+        /* Estilos para la pregunta de música */
+        .music-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .music-icon {
+            font-size: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Efecto de notas musicales */
+        .music-note {
+            position: fixed;
+            font-size: 24px;
+            z-index: 10;
+            opacity: 0;
+            animation: floatUp 3s linear forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Efectos de texto mejorados */
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 red;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 blue;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(42px, 9999px, 44px, 0); }
+            5% { clip: rect(12px, 9999px, 59px, 0); }
+            10% { clip: rect(48px, 9999px, 29px, 0); }
+            15% { clip: rect(42px, 9999px, 73px, 0); }
+            20% { clip: rect(63px, 9999px, 27px, 0); }
+            25% { clip: rect(34px, 9999px, 55px, 0); }
+            30% { clip: rect(86px, 9999px, 73px, 0); }
+            35% { clip: rect(20px, 9999px, 20px, 0); }
+            40% { clip: rect(26px, 9999px, 60px, 0); }
+            45% { clip: rect(25px, 9999px, 66px, 0); }
+            50% { clip: rect(57px, 9999px, 98px, 0); }
+            55% { clip: rect(5px, 9999px, 46px, 0); }
+            60% { clip: rect(82px, 9999px, 31px, 0); }
+            65% { clip: rect(54px, 9999px, 27px, 0); }
+            70% { clip: rect(28px, 9999px, 99px, 0); }
+            75% { clip: rect(45px, 9999px, 69px, 0); }
+            80% { clip: rect(23px, 9999px, 85px, 0); }
+            85% { clip: rect(54px, 9999px, 84px, 0); }
+            90% { clip: rect(45px, 9999px, 47px, 0); }
+            95% { clip: rect(37px, 9999px, 20px, 0); }
+            100% { clip: rect(4px, 9999px, 91px, 0); }
+        }
+
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            5% { clip: rect(52px, 9999px, 74px, 0); }
+            10% { clip: rect(79px, 9999px, 85px, 0); }
+            15% { clip: rect(75px, 9999px, 5px, 0); }
+            20% { clip: rect(67px, 9999px, 61px, 0); }
+            25% { clip: rect(14px, 9999px, 79px, 0); }
+            30% { clip: rect(1px, 9999px, 66px, 0); }
+            35% { clip: rect(86px, 9999px, 30px, 0); }
+            40% { clip: rect(23px, 9999px, 98px, 0); }
+            45% { clip: rect(85px, 9999px, 72px, 0); }
+            50% { clip: rect(71px, 9999px, 75px, 0); }
+            55% { clip: rect(2px, 9999px, 48px, 0); }
+            60% { clip: rect(30px, 9999px, 16px, 0); }
+            65% { clip: rect(59px, 9999px, 50px, 0); }
+            70% { clip: rect(41px, 9999px, 62px, 0); }
+            75% { clip: rect(2px, 9999px, 82px, 0); }
+            80% { clip: rect(47px, 9999px, 73px, 0); }
+            85% { clip: rect(3px, 9999px, 27px, 0); }
+            90% { clip: rect(26px, 9999px, 55px, 0); }
+            95% { clip: rect(42px, 9999px, 97px, 0); }
+            100% { clip: rect(38px, 9999px, 49px, 0); }
+        }
+    </style>
+</head>
+<body class="night-sky">
+    <!-- Canvas para partículas -->
+    <div id="particles-js" class="particles-js"></div>
+    
+    <!-- Campo de estrellas -->
+    <div id="starfield"></div>
+    
+    <!-- Control de música -->
+    <div class="music-control" id="music-control" title="Activar/Desactivar música">♪</div>
+    
+    <!-- Audio para música de fondo -->
+    <audio id="background-music" loop>
+        <source src="musica/Plok.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    
+    <div id="quiz-container">
+        <div class="quiz-header">
+            <h1 class="quiz-title glitch-text" data-text="🎂 QUIZ DE CUMPLEAÑOS 🎂">🎂 QUIZ DE CUMPLEAÑOS 🎂</h1>
+            <p class="quiz-subtitle">Demuestra cuánto sabes sobre nuestra amistad</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+        
+        <div class="question-container" id="question1">
+            <div class="question-number" style="position: sticky; top: 0; background: rgba(0, 0, 0, 0.8); z-index: 10;">Pregunta 1/7</div>
+            <div class="question-text">¿Donde nos conocimos?</div>
+            <div class="options-container">
+                <div class="image-side">
+                    <div class="image-placeholder">
+                        🌐 Plataforma de encuentro
+                    </div>
+                </div>
+                <div class="options-side">
+                    <div class="option" data-correct="false">Amino</div>
+                    <div class="option" data-correct="true">Discord</div>
+                    <div class="option hidden-option" data-special="tuCasa">¿Tu casa?</div>
+                </div>
+            </div>
+            
+            <!-- Respuesta del personaje con espacio para imagen -->
+            <div class="character-response-container" id="response1">
+                <div class="character-response-content">
+                    <div class="character-image-container">
+                        <img class="character-response-image" src="" alt="Expresión del personaje">
+                        <div class="image-placeholder">Personaje</div>
+                    </div>
+                    <div class="character-response-text" id="response-text1"></div>
+                </div>
+            </div>
+            
+            <div class="next-indicator" id="next1">▼ Click para continuar ▼</div>
+        </div>
+
+        <div class="question-container" id="question2" style="display: none;">
+            <div class="question-number" style="position: sticky; top: 0; background: rgba(0, 0, 0, 0.8); z-index: 10;">Pregunta 2/7</div>
+            <div class="question-text">¿De donde es esta imagen?</div>
+            <div class="options-container">
+                <div class="image-side">
+                    <img src="imagenes/quiz/Melio.jpg" alt="Imagen relacionada" class="question-image">
+                </div>
+                <div class="options-side">
+                    <div class="option" data-correct="false">Schizoland</div>
+                    <div class="option" data-correct="true">Server de Melio</div>
+                    <div class="option" data-correct="false">Servidor aparte con Tony</div>
+                    <div class="option" data-special="quienSabe">Quien sabe</div>
+                </div>
+            </div>
+            
+            <div class="character-response-container" id="response2">
+                <div class="character-response-content">
+                    <div class="character-image-container">
+                        <img class="character-response-image" src="" alt="Expresión del personaje">
+                        <div class="image-placeholder">Personaje</div>
+                    </div>
+                    <div class="character-response-text" id="response-text2"></div>
+                </div>
+            </div>
+            
+            <div class="next-indicator" id="next2">▼ Click para continuar ▼</div>
+        </div>
+
+        <div class="question-container" id="question3" style="display: none;">
+            <div class="question-number" style="position: sticky; top: 0; background: rgba(0, 0, 0, 0.8); z-index: 10;">Pregunta 3/7</div>
+            <div class="question-text">¿De donde es esta imagen?</div>
+            <div class="options-container">
+                <div class="image-side">
+                    <img src="imagenes/quiz/Tony.png" alt="Imagen relacionada" class="question-image">
+                </div>
+                <div class="options-side">
+                    <div class="option" data-correct="false">Server de Melio</div>
+                    <div class="option" data-correct="false">Schizoland</div>
+                    <div class="option" data-correct="true">Servidor aparte con Tony</div>
+                    <div class="option" data-special="decadencia">Cuenta en decadencia, repitio pregunta</div>
+                </div>
+            </div>
+            
+            <div class="character-response-container" id="response3">
+                <div class="character-response-content">
+                    <div class="character-image-container">
+                        <img class="character-response-image" src="" alt="Expresión del personaje">
+                        <div class="image-placeholder">Personaje</div>
+                    </div>
+                    <div class="character-response-text" id="response-text3"></div>
+                </div>
+            </div>
+            
+            <div class="next-indicator" id="next3">▼ Click para continuar ▼</div>
+        </div>
+
+        <!-- Nueva Pregunta 4 -->
+        <div class="question-container" id="question4" style="display: none;">
+            <div class="question-number" style="position: sticky; top: 0; background: rgba(0, 0, 0, 0.8); z-index: 10;">Pregunta 4/7</div>
+            <div class="question-text">¿Fecha de nuestro primer mensaje de whatsapp?</div>
+            <div class="options-container">
+                <div class="image-side">
+                    <div class="image-placeholder">
+                        📱 Primer mensaje
+                    </div>
+                </div>
+                <div class="options-side">
+                    <div class="option" data-correct="true">29 de agosto de 2023</div>
+                    <div class="option" data-correct="false">70 de MiAbuelo de 2077</div>
+                    <div class="option" data-correct="false">17-3-24</div>
+                </div>
+            </div>
+            
+            <div class="character-response-container" id="response4">
+                <div class="character-response-content">
+                    <div class="character-image-container">
+                        <img class="character-response-image" src="" alt="Expresión del personaje">
+                        <div class="image-placeholder">Personaje</div>
+                    </div>
+                    <div class="character-response-text" id="response-text4"></div>
+                </div>
+            </div>
+            
+            <div class="next-indicator" id="next4">▼ Click para continuar ▼</div>
+        </div>
+
+        <!-- Nueva Pregunta 5 -->
+        <div class="question-container" id="question5" style="display: none;">
+            <div class="question-number" style="position: sticky; top: 0; background: rgba(0, 0, 0, 0.8); z-index: 10;">Pregunta 5/7</div>
+            <div class="question-text">¿Cuál fue el primer juego que jugamos juntos?</div>
+            <div class="options-container">
+                <div class="image-side">
+                    <div class="image-placeholder">
+                        🎮 Primer juego juntos
+                    </div>
+                </div>
+                <div class="options-side">
+                    <div class="option" data-correct="true">Minecraft</div>
+                    <div class="option" data-correct="false">Bussines Tour</div>
+                    <div class="option" data-correct="false">Roblox</div>
+                    <div class="option hidden-option" data-special="noRecuerdo">No recuerdo</div>
+                </div>
+            </div>
+            
+            <div class="character-response-container" id="response5">
+                <div class="character-response-content">
+                    <div class="character-image-container">
+                        <img class="character-response-image" src="" alt="Expresión del personaje">
+                        <div class="image-placeholder">Personaje</div>
+                    </div>
+                    <div class="character-response-text" id="response-text5"></div>
+                </div>
+            </div>
+            
+            <div class="next-indicator" id="next5">▼ Click para continuar ▼</div>
+        </div>
+
+        <!-- Nueva Pregunta 6 - Juegos compartidos -->
+        <div class="question-container" id="question6" style="display: none;">
+            <div class="question-number" style="position: sticky; top: 0; background: rgba(0, 0, 0, 0.8); z-index: 10;">Pregunta 6/7</div>
+            <div class="question-text">¿Qué juegos hemos compartido?</div>
+            <div class="options-container">
+                <div class="image-side">
+                    <div class="image-placeholder">
+                        🎮 Juegos compartidos
+                    </div>
+                </div>
+                <div class="options-side">
+                    <div class="option" data-correct="false">Ultra Kill, Minecraft, Genshin</div>
+                    <div class="option" data-correct="false">Minecraft, Isaac, Balatro</div>
+                    <div class="option" data-correct="true">Balatro, Minecraft, Ultra Kill</div>
+                    <div class="option" data-correct="false">Roblox, Brawl y quien sabe</div>
+                </div>
+            </div>
+            
+            <div class="character-response-container" id="response6">
+                <div class="character-response-content">
+                    <div class="character-image-container">
+                        <img class="character-response-image" src="" alt="Expresión del personaje">
+                        <div class="image-placeholder">Personaje</div>
+                    </div>
+                    <div class="character-response-text" id="response-text6"></div>
+                </div>
+            </div>
+            
+            <div class="next-indicator" id="next6">▼ Click para continuar ▼</div>
+        </div>
+
+        <!-- Nueva Pregunta 7 - Música compartida -->
+        <div class="question-container" id="question7" style="display: none;">
+            <div class="question-number" style="position: sticky; top: 0; background: rgba(0, 0, 0, 0.8); z-index: 10;">Pregunta 7/7</div>
+            <div class="question-text">¿Qué tipo de música hemos compartido mutuamente?</div>
+            <div class="music-icons">
+                <div class="music-icon">🎵</div>
+                <div class="music-icon">🎶</div>
+                <div class="music-icon">🎼</div>
+                <div class="music-icon">🎸</div>
+            </div>
+            <div class="options-container">
+                <div class="image-side">
+                    <div class="image-placeholder">
+                        🎵 Música compartida
+                    </div>
+                </div>
+                <div class="options-side">
+                    <div class="option" data-correct="true">Rock</div>
+                    <div class="option" data-correct="false">Reguetton</div>
+                    <div class="option" data-special="quienSabeAmor">Quien sabe amor</div>
+                    <div class="option" data-special="customMusic">
+                        <div>Escribe tu propia respuesta!</div>
+                        <div class="custom-answer-container">
+                            <input type="text" class="custom-answer-input" placeholder="Escribe aquí tu respuesta...">
+                            <button class="submit-custom-answer">Enviar respuesta</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="character-response-container" id="response7">
+                <div class="character-response-content">
+                    <div class="character-image-container">
+                        <img class="character-response-image" src="" alt="Expresión del personaje">
+                        <div class="image-placeholder">Personaje</div>
+                    </div>
+                    <div class="character-response-text" id="response-text7"></div>
+                </div>
+            </div>
+            
+            <div class="next-indicator" id="next7">▼ Click para continuar ▼</div>
+        </div>
+    </div>
+
+    <!-- Librerías JavaScript -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        // Variables de control
+        let musicEnabled = true;
+        let currentQuestion = 1;
+        const totalQuestions = 7;
+
+        // Inicializar partículas de fondo
+        function initParticles() {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: "#ffffff" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.3, random: true },
+                    size: { value: 2, random: true },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: "#ffffff",
+                        opacity: 0.2,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 1,
+                        direction: "none",
+                        random: true,
+                        straight: false,
+                        out_mode: "out",
+                        bounce: false
+                    }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "repulse" },
+                        onclick: { enable: true, mode: "push" },
+                        resize: true
+                    }
+                }
+            });
+        }
+
+        // Crear estrellas para el fondo
+        function createStars() {
+            const starfield = document.getElementById('starfield');
+            const starsCount = 150;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                const size = Math.random();
+                
+                if (size > 0.7) {
+                    star.className = 'star star-large';
+                } else if (size > 0.4) {
+                    star.className = 'star star-medium';
+                } else {
+                    star.className = 'star star-small';
+                }
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                
+                // Algunas estrellas titilan
+                if (Math.random() > 0.5) {
+                    star.style.animation = `blink ${Math.random() * 5 + 3}s infinite`;
+                }
+                
+                starfield.appendChild(star);
+            }
+            
+            // Crear algunas estrellas fugaces
+            createShootingStars();
+        }
+
+        // Crear estrellas fugaces
+        function createShootingStars() {
+            const starfield = document.getElementById('starfield');
+            
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const shootingStar = document.createElement('div');
+                    shootingStar.className = 'shooting-star';
+                    shootingStar.style.left = `${Math.random() * 100}%`;
+                    shootingStar.style.top = `${Math.random() * 30}%`;
+                    shootingStar.style.animation = `shooting ${Math.random() * 2 + 1}s linear`;
+                    
+                    starfield.appendChild(shootingStar);
+                    
+                    setTimeout(() => {
+                        shootingStar.remove();
+                    }, 2000);
+                }
+            }, 3000);
+        }
+
+        // Control de música
+        function setupMusic() {
+            const backgroundMusic = document.getElementById('background-music');
+            const musicControl = document.getElementById('music-control');
+            
+            // Intentar reproducir música después de la interacción del usuario
+            document.addEventListener('click', function initMusic() {
+                if (musicEnabled) {
+                    backgroundMusic.volume = 0.4;
+                    backgroundMusic.play().catch(e => {
+                        console.log("La reproducción automática fue bloqueada:", e);
+                    });
+                }
+                document.removeEventListener('click', initMusic);
+            }, { once: true });
+            
+            // Control para activar/desactivar música
+            musicControl.addEventListener('click', function() {
+                musicEnabled = !musicEnabled;
+                if (musicEnabled) {
+                    backgroundMusic.play();
+                    musicControl.textContent = '♪';
+                    musicControl.style.background = 'rgba(255, 255, 255, 0.9)';
+                    musicControl.style.color = '#000';
+                } else {
+                    backgroundMusic.pause();
+                    musicControl.textContent = '🔇';
+                    musicControl.style.background = 'rgba(255, 0, 0, 0.3)';
+                }
+            });
+        }
+
+        // Actualizar barra de progreso
+        function updateProgress() {
+            const progressFill = document.getElementById('progress-fill');
+            const progress = (currentQuestion / totalQuestions) * 100;
+            progressFill.style.width = `${progress}%`;
+        }
+
+        // Efecto de confeti mejorado con la librería
+        function createConfetti() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff9900', '#ff66cc'],
+                shapes: ['square', 'circle']
+            });
+            
+            // Efecto adicional para más duración
+            setTimeout(() => {
+                confetti({
+                    particleCount: 100,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff']
+                });
+            }, 250);
+            
+            setTimeout(() => {
+                confetti({
+                    particleCount: 100,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff']
+                });
+            }, 400);
+        }
+
+        // Efecto de notas musicales
+        function createMusicNotes() {
+            const notes = ['♪', '♫', '🎵', '🎶', '🎼', '🎸', '🎹'];
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const note = document.createElement('div');
+                    note.className = 'music-note';
+                    note.textContent = notes[Math.floor(Math.random() * notes.length)];
+                    note.style.left = `${Math.random() * 100}%`;
+                    note.style.fontSize = `${Math.random() * 20 + 20}px`;
+                    note.style.animationDuration = `${Math.random() * 2 + 2}s`;
+                    document.body.appendChild(note);
+                    
+                    setTimeout(() => {
+                        note.remove();
+                    }, 3000);
+                }, i * 200);
+            }
+        }
+
+        // Función para mostrar respuesta con imagen
+        function showCharacterResponse(questionNumber, text, imageUrl = '') {
+            const responseContainer = document.getElementById(`response${questionNumber}`);
+            const responseText = document.getElementById(`response-text${questionNumber}`);
+            const responseImage = responseContainer.querySelector('.character-response-image');
+            const imagePlaceholder = responseContainer.querySelector('.image-placeholder');
+            
+            responseText.textContent = text;
+            
+            if (imageUrl) {
+                responseImage.src = imageUrl;
+                responseImage.style.display = 'block';
+                imagePlaceholder.style.display = 'none';
+            } else {
+                responseImage.style.display = 'none';
+                imagePlaceholder.style.display = 'block';
+            }
+            
+            responseContainer.style.display = 'block';
+            // Añadir animación de entrada
+            responseContainer.classList.add('animate__animated', 'animate__fadeInUp');
+        }
+
+        // Manejar las respuestas
+        function setupQuiz() {
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Evitar que se procese el clic en el contenedor de respuesta personalizada
+                    if (this.dataset.special === 'customMusic') {
+                        return;
+                    }
+                    
+                    const questionContainer = this.closest('.question-container');
+                    const questionId = questionContainer.id;
+                    const questionNumber = questionId.replace('question', '');
+                    const nextIndicator = questionContainer.querySelector('.next-indicator');
+                    
+                    // Deshabilitar todas las opciones de esta pregunta
+                    const allOptions = questionContainer.querySelectorAll('.option');
+                    allOptions.forEach(opt => {
+                        opt.style.pointerEvents = 'none';
+                        opt.style.opacity = '0.6';
+                    });
+                    
+                    // Añadir clase de animación a la opción seleccionada
+                    this.classList.add('animate__animated', 'animate__pulse');
+                    
+                    // Mostrar respuesta según la opción seleccionada
+                    if (this.dataset.special === 'tuCasa') {
+                        showCharacterResponse(
+                            questionNumber, 
+                            "Ojala, Dios te escuche pero incorrecto",
+                            'imagenes/Arthur/Arthur_UwU.jpg'
+                        );
+                        createConfetti();
+                    } 
+                    else if (this.dataset.special === 'quienSabe') {
+                        showCharacterResponse(
+                            questionNumber,
+                            "Yo, por algo puse las preguntas",
+                            'imagenes/Arthur/Arthur_Meh.jpg'
+                        );
+                    }
+                    else if (this.dataset.special === 'decadencia') {
+                        showCharacterResponse(
+                            questionNumber,
+                            "Callate",
+                            'imagenes/Arthur/Arthur_Serio.jpg'
+                        );
+                    }
+                    else if (this.dataset.special === 'noRecuerdo') {
+                        showCharacterResponse(
+                            questionNumber,
+                            "Que feo que no te acuerdes ¿No?",
+                            'imagenes/Arthur/Arthur_Meh.jpg'
+                        );
+                    }
+                    else if (this.dataset.special === 'quienSabeAmor') {
+                        showCharacterResponse(
+                            questionNumber,
+                            "Yo, por algo puse las preguntas amor",
+                            'imagenes/Arthur/Arthur_UwU.jpg'
+                        );
+                    }
+                    else if (this.dataset.correct === 'true') {
+                        showCharacterResponse(
+                            questionNumber,
+                            "¡Correcto!",
+                            'imagenes/Arthur/Arthur_Feli.jpg'
+                        );
+                        createConfetti();
+                        this.classList.add('correct');
+                    } else {
+                        showCharacterResponse(
+                            questionNumber,
+                            "Incorrecto",
+                            'imagenes/Arthur/Arthur_Nervio.jpg'
+                        );
+                        this.classList.add('incorrect');
+                    }
+                    
+                    // Mostrar indicador para continuar
+                    setTimeout(() => {
+                        nextIndicator.style.display = 'block';
+                        nextIndicator.classList.add('animate__animated', 'animate__bounce');
+                    }, 1000);
+                });
+            });
+            
+            // Configurar el campo de respuesta personalizada para música
+            setupCustomAnswer();
+            
+            // Configurar navegación entre preguntas
+            setupNavigation();
+        }
+
+        function setupCustomAnswer() {
+            const customAnswerInput = document.querySelector('.custom-answer-input');
+            const submitCustomAnswer = document.querySelector('.submit-custom-answer');
+            
+            if (submitCustomAnswer) {
+                submitCustomAnswer.addEventListener('click', function() {
+                    const questionContainer = this.closest('.question-container');
+                    const questionNumber = questionContainer.id.replace('question', '');
+                    const nextIndicator = questionContainer.querySelector('.next-indicator');
+                    const inputValue = customAnswerInput.value.trim();
+                    
+                    // Deshabilitar todas las opciones de esta pregunta
+                    const allOptions = questionContainer.querySelectorAll('.option');
+                    allOptions.forEach(opt => {
+                        opt.style.pointerEvents = 'none';
+                        opt.style.opacity = '0.6';
+                    });
+                    
+                    // Mostrar respuesta para respuesta personalizada
+                    showCharacterResponse(
+                        questionNumber,
+                        `Supongo que correcta, tu debes saberlo, no?`,
+                        'imagenes/Arthur/Arthur_UwU.jpg'
+                    );
+                    
+                    // Efecto de notas musicales
+                    createMusicNotes();
+                    
+                    // Mostrar indicador para continuar
+                    setTimeout(() => {
+                        nextIndicator.style.display = 'block';
+                        nextIndicator.classList.add('animate__animated', 'animate__bounce');
+                    }, 1000);
+                });
+                
+                // Permitir enviar con Enter
+                customAnswerInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        submitCustomAnswer.click();
+                    }
+                });
+            }
+        }
+
+        function setupNavigation() {
+            const nextIndicators = document.querySelectorAll('.next-indicator');
+            
+            nextIndicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', function() {
+                    const currentQuestionElement = document.getElementById(`question${index + 1}`);
+                    const nextQuestion = document.getElementById(`question${index + 2}`);
+                    
+                    if (currentQuestionElement) {
+                        currentQuestionElement.style.display = 'none';
+                    }
+                    
+                    if (nextQuestion) {
+                        nextQuestion.style.display = 'block';
+                        // Añadir animación de entrada a la siguiente pregunta
+                        nextQuestion.classList.add('animate__animated', 'animate__fadeIn');
+                        currentQuestion = index + 2;
+                        updateProgress();
+                    } else {
+                        // Redireccionar a la página de agradecimiento
+                        setTimeout(() => {
+                            window.location.href = 'Gracias.html';
+                        }, 500);
+                    }
+                });
+            });
+        }
+
+        // Inicializar animaciones GSAP
+        function initAnimations() {
+            // Animación de entrada para el quiz
+            gsap.from('#quiz-container', {
+                duration: 1.5,
+                y: 50,
+                opacity: 0,
+                ease: "back.out(1.7)"
+            });
+            
+            // Animación para las preguntas
+            gsap.from('.question-container', {
+                duration: 1,
+                y: 30,
+                opacity: 0,
+                stagger: 0.2,
+                ease: "power2.out"
+            });
+        }
+
+        // Inicializar
+        function init() {
+            createStars();
+            initParticles();
+            setupMusic();
+            setupQuiz();
+            updateProgress();
+            initAnimations();
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
